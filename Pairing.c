@@ -3397,7 +3397,8 @@ int main(void){
 	Tate_Pairing(&tmp,&P,&Q);
 	end = clock();
 	printf("result\n");
-	Fp24_Show(&tmp);//hoge
+	Fp24_Show(&tmp);//hogeaaaaaaaa
+	//Hello
 
 	printf("TatePairing Time %f\n",(double)(end-start)/CLOCKS_PER_SEC);
 
