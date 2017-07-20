@@ -1947,10 +1947,22 @@ void Fp48_Set1(struct Fp48 *X){
 	Fp24_Set1(&X->x[0]);
 }
 
-void Fp48_Set_ui(struct Fp48 *A,unsigned int b){
-	Fp24_Set_ui(&A->x[0],b);
-	Fp24_Init(&A->x[1]);
+void Fp48_Set_ui(struct Fp48 *A, unsigned int b){
+	Fp48_Init(A);
+	mpz_set_ui(A->x[0].x[0].x[0].x[0],b);
+	mpz_set_ui(A->x[0].x[0].x[0].x[1],b);
+	mpz_set_ui(A->x[0].x[0].x[0].x[2],b);
+	mpz_set_ui(A->x[0].x[0].x[0].x[3],b);
+	mpz_set_ui(A->x[0].x[1].x[0].x[0],b);
+	mpz_set_ui(A->x[0].x[1].x[0].x[1],b);
+	mpz_set_ui(A->x[0].x[1].x[0].x[2],b);
+	mpz_set_ui(A->x[0].x[1].x[0].x[3],b);
+	mpz_set_ui(A->x[0].x[2].x[0].x[0],b);
+	mpz_set_ui(A->x[0].x[2].x[0].x[1],b);
+	mpz_set_ui(A->x[0].x[2].x[0].x[2],b);
+	mpz_set_ui(A->x[0].x[2].x[0].x[3],b);
 }
+
 
 void Fp48_Copy(struct Fp48 *X, struct Fp48 *A){
 	Fp24_Copy(&X->x[0],&A->x[0]);
@@ -1975,7 +1987,7 @@ void Fp48_Mul(struct Fp48 *Ans, struct Fp48 *A, struct Fp48 *B){
 	Fp24_Init(&tmp1);
 	Fp24_Init(&tmp2);
 	Fp48_Init(&Ans_Copy);
-	int i,j;
+	//int i,j;
 
 	/*
 	for(i=0;i<3;i++){
@@ -1984,13 +1996,17 @@ void Fp48_Mul(struct Fp48 *Ans, struct Fp48 *A, struct Fp48 *B){
 		mpz_set_ui(Omega.x[i].x[1].x[j],1);
 	}}
 	*/
-	
+	/*
 	for(i=0;i<2;i++){
 	for(j=0;j<4;j++){
 		mpz_set_ui(Omega.x[0].x[i].x[j],4);
 		mpz_set_ui(Omega.x[1].x[i].x[j],3);
 		mpz_set_ui(Omega.x[2].x[i].x[j],3);
-	}}
+	}}*/
+	mpz_set_ui(Omega.x[0].x[1].x[0],2);
+	mpz_set_ui(Omega.x[0].x[1].x[1],3);
+	mpz_set_ui(Omega.x[0].x[1].x[2],3);
+	mpz_set_ui(Omega.x[0].x[1].x[3],3);
 
 	Fp24_Add(&tmp1, &A->x[0], &A->x[1]);
 	Fp24_Add(&tmp2, &B->x[0], &B->x[1]);
@@ -2037,7 +2053,7 @@ void Fp48_Sqr(struct Fp48 *Ans, struct Fp48 *X){
 	Fp24_Init(&Omega);
 	Fp24_Init(&tmp);
 	Fp48_Init(&Ans_Copy);
-	int i,j;
+	//int i,j;
 
 	/*
 	for(i=0;i<3;i++){
@@ -2046,13 +2062,17 @@ void Fp48_Sqr(struct Fp48 *Ans, struct Fp48 *X){
 		mpz_set_ui(Omega.x[i].x[1].x[j],1);
 	}}
 	*/
-	
+	/*
 	for(i=0;i<2;i++){
 	for(j=0;j<4;j++){
 		mpz_set_ui(Omega.x[0].x[i].x[j],4);
 		mpz_set_ui(Omega.x[1].x[i].x[j],3);
 		mpz_set_ui(Omega.x[2].x[i].x[j],3);
-	}}
+	}}*/
+	mpz_set_ui(Omega.x[0].x[1].x[0],2);
+	mpz_set_ui(Omega.x[0].x[1].x[1],3);
+	mpz_set_ui(Omega.x[0].x[1].x[2],3);
+	mpz_set_ui(Omega.x[0].x[1].x[3],3);
 
 	Fp24_Add(&Ans_Copy.x[1], &X->x[0], &X->x[1]);
 	Fp24_Sqr(&Ans_Copy.x[1], &Ans_Copy.x[1]);
@@ -2265,6 +2285,16 @@ void Fp48_Frob(struct Fp48 *Ans, struct Fp48 *X){
 	Fp48_Clear(&Ans_Copy);
 }
 
+void Fp48_Frobp(struct Fp48 *Ans, struct Fp48 *X){
+	struct Fp48 tmp;
+	Fp48_Init(&tmp);
+
+	Fp48_Pow(&tmp,X,prime);
+	Fp48_Copy(Ans,&tmp);
+	Fp48_Clear(&tmp);
+}
+
+
 void Fp48_Rand(struct Fp48 *A){
 	unsigned int i,j,k,l,r;
 	gmp_randstate_t state;
@@ -2370,7 +2400,7 @@ int Fp48_Cmp_mpz(struct Fp48 *A,mpz_t B){
 	
 	for(i=0;i<4;i++){
 	for(j=0;j<3;j++){
-		if(mpz_cmp(A->x[1].x[j].x[0].x[i],0)||mpz_cmp_ui(A->x[0].x[j].x[1].x[i],0)){
+		if(mpz_cmp_ui(A->x[1].x[j].x[0].x[i],0)||mpz_cmp_ui(A->x[1].x[j].x[1].x[i],0)){
 			return 1;
 		}
 	}}
@@ -3254,6 +3284,242 @@ void EFp24_Frob(struct EFp24 *Ans, struct EFp24 *P){
 	Fp24_Frobp(&Ans->x,&P->x);
 	Fp24_Frobp(&Ans->y,&P->y);
 }
+
+//-------------EFp48 functions--------------------------------
+void EFp48_Init(struct EFp48 *A){
+	Fp48_Init(&A->x);
+	Fp48_Init(&A->y);
+	A->Inf=FALSE;
+}
+
+void EFp48_Copy(struct EFp48 *A,struct EFp48 *B){
+	Fp48_Copy(&A->x,&B->x);
+	Fp48_Copy(&A->y,&B->y);
+	A->Inf=B->Inf;
+}
+
+void EFp48_SetInf(struct EFp48 *A){
+	Fp48_Init(&A->x);
+	Fp48_Init(&A->y);
+	A->Inf=TRUE;
+}
+
+void EFp48_Clear(struct EFp48 *A){
+	Fp48_Clear(&A->x);
+	Fp48_Clear(&A->y);
+}
+
+void EFp48_Rand(struct EFp48 *A){
+	struct EFp48 Ans_Copy;
+	struct Fp48 tmp,ECC_b;
+	mpz_t j;
+	EFp48_Init(&Ans_Copy);
+	Fp48_Init(&tmp);
+	Fp48_Init(&ECC_b);
+	mpz_init(j);
+	
+	Fp48_Set_ui(&ECC_b,ECCPara_b);
+	mpz_set_ui(j,3);
+	while(Fp48_Legendre(&tmp)!=1){
+		Fp48_Rand(&Ans_Copy.x);
+		Fp48_Pow(&tmp,&Ans_Copy.x,j);
+		Fp48_Add(&tmp,&tmp,&ECC_b);
+	}
+	Fp48_Sqrt(&Ans_Copy.y,&tmp);
+	EFp48_Copy(A,&Ans_Copy);
+
+	EFp48_Clear(&Ans_Copy);
+	Fp48_Clear(&tmp);
+	Fp48_Clear(&ECC_b);
+	mpz_clear(j);
+}
+
+void EFp48_Show(struct EFp48 *A){
+	printf("x=\n");
+	gmp_printf("((%Zd,%Zd,%Zd,%Zd),(%Zd,%Zd,%Zd,%Zd))\n",A->x.x[0].x[0].x[0].x[0],A->x.x[0].x[0].x[0].x[1],A->x.x[0].x[0].x[0].x[2],A->x.x[0].x[0].x[0].x[3],A->x.x[0].x[0].x[1].x[0],A->x.x[0].x[0].x[1].x[1],A->x.x[0].x[0].x[1].x[2],A->x.x[0].x[0].x[1].x[3]);
+	gmp_printf("((%Zd,%Zd,%Zd,%Zd),(%Zd,%Zd,%Zd,%Zd))\n",A->x.x[0].x[1].x[0].x[0],A->x.x[0].x[1].x[0].x[1],A->x.x[0].x[1].x[0].x[2],A->x.x[0].x[1].x[0].x[3],A->x.x[0].x[1].x[1].x[0],A->x.x[0].x[1].x[1].x[1],A->x.x[0].x[1].x[1].x[2],A->x.x[0].x[1].x[1].x[3]);
+	gmp_printf("((%Zd,%Zd,%Zd,%Zd),(%Zd,%Zd,%Zd,%Zd)),\n",A->x.x[0].x[2].x[0].x[0],A->x.x[0].x[2].x[0].x[1],A->x.x[0].x[2].x[0].x[2],A->x.x[0].x[2].x[0].x[3],A->x.x[0].x[2].x[1].x[0],A->x.x[0].x[2].x[1].x[1],A->x.x[0].x[2].x[1].x[2],A->x.x[0].x[2].x[1].x[3]);
+	gmp_printf("((%Zd,%Zd,%Zd,%Zd),(%Zd,%Zd,%Zd,%Zd))\n",A->x.x[1].x[0].x[0].x[0],A->x.x[1].x[0].x[0].x[1],A->x.x[1].x[0].x[0].x[2],A->x.x[1].x[0].x[0].x[3],A->x.x[1].x[0].x[1].x[0],A->x.x[1].x[0].x[1].x[1],A->x.x[1].x[0].x[1].x[2],A->x.x[1].x[0].x[1].x[3]);
+	gmp_printf("((%Zd,%Zd,%Zd,%Zd),(%Zd,%Zd,%Zd,%Zd))\n",A->x.x[1].x[1].x[0].x[0],A->x.x[1].x[1].x[0].x[1],A->x.x[1].x[1].x[0].x[2],A->x.x[1].x[1].x[0].x[3],A->x.x[1].x[1].x[1].x[0],A->x.x[1].x[1].x[1].x[1],A->x.x[1].x[1].x[1].x[2],A->x.x[1].x[1].x[1].x[3]);
+	gmp_printf("((%Zd,%Zd,%Zd,%Zd),(%Zd,%Zd,%Zd,%Zd)),\n",A->x.x[1].x[2].x[0].x[0],A->x.x[1].x[2].x[0].x[1],A->x.x[1].x[2].x[0].x[2],A->x.x[1].x[2].x[0].x[3],A->x.x[1].x[2].x[1].x[0],A->x.x[1].x[2].x[1].x[1],A->x.x[1].x[2].x[1].x[2],A->x.x[1].x[2].x[1].x[3]);
+	printf("y=\n");
+	gmp_printf("((%Zd,%Zd,%Zd,%Zd),(%Zd,%Zd,%Zd,%Zd))\n",A->y.x[0].x[0].x[0].x[0],A->y.x[0].x[0].x[0].x[1],A->y.x[0].x[0].x[0].x[2],A->y.x[0].x[0].x[0].x[3],A->y.x[0].x[0].x[1].x[0],A->y.x[0].x[0].x[1].x[1],A->y.x[0].x[0].x[1].x[2],A->y.x[0].x[0].x[1].x[3]);
+	gmp_printf("((%Zd,%Zd,%Zd,%Zd),(%Zd,%Zd,%Zd,%Zd))\n",A->y.x[0].x[1].x[0].x[0],A->y.x[0].x[1].x[0].x[1],A->y.x[0].x[1].x[0].x[2],A->y.x[0].x[1].x[0].x[3],A->y.x[0].x[1].x[1].x[0],A->y.x[0].x[1].x[1].x[1],A->y.x[0].x[1].x[1].x[2],A->y.x[0].x[1].x[1].x[3]);
+	gmp_printf("((%Zd,%Zd,%Zd,%Zd),(%Zd,%Zd,%Zd,%Zd)),\n",A->y.x[0].x[2].x[0].x[0],A->y.x[0].x[2].x[0].x[1],A->y.x[0].x[2].x[0].x[2],A->y.x[0].x[2].x[0].x[3],A->y.x[0].x[2].x[1].x[0],A->y.x[0].x[2].x[1].x[1],A->y.x[0].x[2].x[1].x[2],A->y.x[0].x[2].x[1].x[3]);
+	gmp_printf("((%Zd,%Zd,%Zd,%Zd),(%Zd,%Zd,%Zd,%Zd))\n",A->y.x[1].x[0].x[0].x[0],A->y.x[1].x[0].x[0].x[1],A->y.x[1].x[0].x[0].x[2],A->y.x[1].x[0].x[0].x[3],A->y.x[1].x[0].x[1].x[0],A->y.x[1].x[0].x[1].x[1],A->y.x[1].x[0].x[1].x[2],A->y.x[1].x[0].x[1].x[3]);
+	gmp_printf("((%Zd,%Zd,%Zd,%Zd),(%Zd,%Zd,%Zd,%Zd))\n",A->y.x[1].x[1].x[0].x[0],A->y.x[1].x[1].x[0].x[1],A->y.x[1].x[1].x[0].x[2],A->y.x[1].x[1].x[0].x[3],A->y.x[1].x[1].x[1].x[0],A->y.x[1].x[1].x[1].x[1],A->y.x[1].x[1].x[1].x[2],A->y.x[1].x[1].x[1].x[3]);
+	gmp_printf("((%Zd,%Zd,%Zd,%Zd),(%Zd,%Zd,%Zd,%Zd)),\n",A->y.x[1].x[2].x[0].x[0],A->y.x[1].x[2].x[0].x[1],A->y.x[1].x[2].x[0].x[2],A->y.x[1].x[2].x[0].x[3],A->y.x[1].x[2].x[1].x[0],A->y.x[1].x[2].x[1].x[1],A->y.x[1].x[2].x[1].x[2],A->y.x[1].x[2].x[1].x[3]);
+}
+
+void EFp48_ECA(struct EFp48 *Ans, struct EFp48 *P, struct EFp48 *Q){
+	if(P->Inf==TRUE){
+		EFp48_Copy(Ans, Q);
+		return;
+	}else if(Q->Inf==TRUE){
+		EFp48_Copy(Ans, P);
+		return;
+	}else if(Fp48_Cmp(&P->x,&Q->x)==0&&Fp48_Cmp(&P->y,&Q->y)){
+		EFp48_SetInf(Ans);
+		return;
+	}else if(Fp48_Cmp(&P->x,&Q->x)==0&&Fp48_Cmp(&P->y,&Q->y)==0){
+		EFp48_ECD(Ans,P);
+		return;
+	}
+
+	struct Fp48 lambda,tmp;
+	struct EFp48 Ans_Copy;
+
+	Fp48_Init(&lambda);
+	Fp48_Init(&tmp);
+	EFp48_Init(&Ans_Copy);
+
+	Fp48_Sub(&tmp,&P->x,&Q->x);
+	Fp48_Inv(&tmp,&tmp);
+	Fp48_Sub(&lambda,&P->y,&Q->y);
+	Fp48_Mul(&lambda,&lambda,&tmp);
+
+	Fp48_Mul(&Ans_Copy.x,&lambda,&lambda);
+	Fp48_Sub(&Ans_Copy.x,&Ans_Copy.x,&P->x);
+	Fp48_Sub(&Ans_Copy.x,&Ans_Copy.x,&Q->x);
+
+	Fp48_Sub(&tmp,&P->x,&Ans_Copy.x);
+	Fp48_Mul(&Ans_Copy.y,&lambda,&tmp);
+	Fp48_Sub(&Ans_Copy.y,&Ans_Copy.y,&P->y);
+	
+	EFp48_Copy(Ans,&Ans_Copy);
+
+	Fp48_Clear(&lambda);
+	Fp48_Clear(&tmp);
+	EFp48_Clear(&Ans_Copy);
+}
+
+void EFp48_ECD(struct EFp48 *Ans, struct EFp48 *P){
+	mpz_t Zero;
+	mpz_init(Zero);
+	if(P->Inf==TRUE){
+		EFp48_SetInf(Ans);
+		mpz_clear(Zero);
+		return;
+	}else if(Fp48_Cmp_mpz(&P->y,Zero)==0){
+		EFp48_SetInf(Ans);
+		mpz_clear(Zero);
+		return;
+	}
+
+	struct Fp48 lambda,tmp;
+	struct EFp48 Ans_Copy;
+
+	Fp48_Init(&lambda);
+	Fp48_Init(&tmp);
+	EFp48_Init(&Ans_Copy);
+
+	Fp48_Mul(&lambda,&P->x,&P->x);
+	Fp48_Add(&tmp,&lambda,&lambda);
+	Fp48_Add(&lambda,&lambda,&tmp);
+	Fp48_Add(&tmp,&P->y,&P->y);
+	Fp48_Inv(&tmp,&tmp);
+	Fp48_Mul(&lambda,&lambda,&tmp);
+
+	Fp48_Mul(&Ans_Copy.x,&lambda,&lambda);
+	Fp48_Add(&tmp,&P->x,&P->x);
+	Fp48_Sub(&Ans_Copy.x,&Ans_Copy.x,&tmp);
+
+	Fp48_Sub(&tmp,&P->x,&Ans_Copy.x);
+	Fp48_Mul(&Ans_Copy.y,&lambda,&tmp);
+	Fp48_Sub(&Ans_Copy.y,&Ans_Copy.y,&P->y);
+
+	EFp48_Copy(Ans,&Ans_Copy);
+
+	Fp48_Clear(&lambda);
+	Fp48_Clear(&tmp);
+	EFp48_Clear(&Ans_Copy);
+}
+/*
+void EFp48_SCM(struct EFp48 *Ans, struct EFp48 *P, mpz_t j){
+	int i;
+	int r;
+	r = (int)mpz_sizeinbase(j,2);
+
+	struct EFp48 Ans_Copy;
+	EFp48_Init(&Ans_Copy);
+	EFp48_Copy(&Ans_Copy,P);
+
+	for(i=r-2;i>=0;i--){
+		if(mpz_tstbit(j,i)==1){
+			EFp48_ECD(&Ans_Copy,&Ans_Copy);
+			EFp48_ECA(&Ans_Copy,&Ans_Copy,P);
+		}else{
+			EFp48_ECD(&Ans_Copy,&Ans_Copy);
+		}
+	}
+
+	EFp48_Copy(Ans,&Ans_Copy);
+	EFp48_Clear(&Ans_Copy);
+}*/
+
+//Window Method
+void EFp48_SCM(struct EFp48 *Ans, struct EFp48 *P, mpz_t j){
+	int TabSize = 2<<(WSize-1);
+	struct EFp48 Table[TabSize],Ans_Copy;
+	int i,r,k,Num;
+	for(i=0;i<TabSize;i++){
+		EFp48_Init(&Table[i]);
+	}
+	EFp48_Init(&Ans_Copy);
+	
+	EFp48_SetInf(&Ans_Copy);
+	EFp48_SetInf(&Table[0]);
+	for(i=1;i<TabSize;i++){
+		EFp48_ECA(&Table[i],&Table[i-1],P);
+	}
+	
+	//Size addjustment
+	r=(int)mpz_sizeinbase(j,2);
+	r+=(WSize-r%WSize)%WSize;
+	r--;
+	
+	Num=0;
+	for(k=1;k<WSize;k++){
+		Num+=mpz_tstbit(j,r);
+		Num=Num<<1;
+		r--;
+	}
+	Num+=mpz_tstbit(j,r);
+	r--;
+	EFp48_ECA(&Ans_Copy,&Ans_Copy,&Table[Num]);
+	for(i=r;i>=0;i-=WSize){
+		for(k=0;k<WSize;k++){
+			EFp48_ECD(&Ans_Copy,&Ans_Copy);
+		}
+		Num=0;
+		for(k=1;k<WSize;k++){
+			Num+=mpz_tstbit(j,r);
+			Num=Num<<1;
+			r--;
+		}
+		Num+=mpz_tstbit(j,r);
+		r--;
+		EFp48_ECA(&Ans_Copy,&Ans_Copy,&Table[Num]);
+	}
+	EFp48_Copy(Ans,&Ans_Copy);
+	
+	for(i=0;i<TabSize;i++){
+		EFp48_Clear(&Table[i]);
+	}
+	EFp48_Clear(&Ans_Copy);
+}
+
+void EFp48_Inv(struct EFp48 *Ans, struct EFp48 *P){
+	Fp48_Copy(&Ans->x,&P->x);
+	Fp48_Neg(&Ans->y,&P->y);
+}
+
+void EFp48_Frob(struct EFp48 *Ans, struct EFp48 *P){
+	Fp48_Frobp(&Ans->x,&P->x);
+	Fp48_Frobp(&Ans->y,&P->y);
+}
+
+//-------------------------Pairing functions-------------------------------------------
 /*
 void EFp24_G1_Rand(struct EFp24 *A){
 	struct EFp24 Ans_Copy;
@@ -3785,13 +4051,15 @@ void Ate_Check(){
 }
 
 void Set_Parameter(mpz_t z,mpz_t prime,mpz_t order,mpz_t trace){
-	mpz_t p4,t4,p8,t8,p24,t24,tmp1,tmp2;
+	mpz_t p4,t4,p8,t8,p24,t24,p48,t48,tmp1,tmp2;
 	mpz_init(p4);
 	mpz_init(t4);
 	mpz_init(p8);
 	mpz_init(t8);
 	mpz_init(p24);
 	mpz_init(t24);
+	mpz_init(p48);
+	mpz_init(t48);
 	mpz_init(tmp1);
 	mpz_init(tmp2);
 	
@@ -3841,6 +4109,14 @@ void Set_Parameter(mpz_t z,mpz_t prime,mpz_t order,mpz_t trace){
 	mpz_sub(r24,p24,t24);
 	mpz_add_ui(r24,r24,1);	//r24 = order of Fp24
 
+	mpz_mul(t48,t24,t24);
+	mpz_mul_ui(tmp2,p24,2);
+	mpz_sub(t48,t48,tmp2);
+	mpz_mul(p48,p24,p24);
+
+	mpz_sub(r48,p48,t48);
+	mpz_add_ui(r48,r48,1);
+
 	ECCPara_b = 4;
 
 	mpz_clear(p4);
@@ -3849,6 +4125,8 @@ void Set_Parameter(mpz_t z,mpz_t prime,mpz_t order,mpz_t trace){
 	mpz_clear(t8);
 	mpz_clear(p24);
 	mpz_clear(t24);
+	mpz_clear(p48);
+	mpz_clear(t48);
 	mpz_clear(tmp1);
 	mpz_clear(tmp2);
 }
@@ -3915,28 +4193,74 @@ void ParaSerch(){
 	mpz_clear(tmp2);
 
 }
-void Free(){
-	struct Fp48 A,B;
-	Fp48_Init(&A);
-	Fp48_Init(&B);
-	Fp48_Rand(&A);
-	Fp48_Show(&A);
-	Fp48_Inv(&B,&A);
-	Fp48_Mul(&A,&A,&B);
-	Fp48_Show(&A);
+void Omega(){
+	struct EFp48 A,B,C;
+	struct Fp24 Omega;
+	EFp48_Init(&A);
+	EFp48_Init(&B);
+	EFp48_Init(&C);
+	Fp24_Init(&Omega);
+	mpz_t hoge;
+	mpz_init(hoge);
+	mpz_pow_ui(hoge,prime,24);
+	mpz_sub_ui(hoge,hoge,1);
+	mpz_div_ui(hoge,hoge,2);
+	//int i,j;
+	/*for(i=0;i<2;i++){
+	for(j=0;j<4;j++){
+		mpz_set_ui(Omega.x[0].x[i].x[j],4);
+		mpz_set_ui(Omega.x[1].x[i].x[j],3);
+		mpz_set_ui(Omega.x[2].x[i].x[j],3);
+	}}*/
+	/*
+	mpz_sub_ui(Omega.x[0].x[0].x[0],prime,1);
+	mpz_sub_ui(Omega.x[0].x[0].x[1],prime,2);
+	mpz_sub_ui(Omega.x[0].x[0].x[2],prime,2);
+	mpz_sub_ui(Omega.x[0].x[0].x[3],prime,2);
+	mpz_sub_ui(Omega.x[0].x[1].x[0],prime,2);
+	mpz_sub_ui(Omega.x[0].x[1].x[1],prime,3);
+	mpz_sub_ui(Omega.x[0].x[1].x[2],prime,3);
+	mpz_sub_ui(Omega.x[0].x[1].x[3],prime,3);
+	*/
+	//mpz_set_ui(Omega.x[0].x[0].x[0],1);
+	//mpz_set_ui(Omega.x[0].x[0].x[1],2);
+	//mpz_set_ui(Omega.x[0].x[0].x[2],2);
+	//mpz_set_ui(Omega.x[0].x[0].x[3],2);
+	mpz_set_ui(Omega.x[0].x[1].x[0],2);
+	mpz_set_ui(Omega.x[0].x[1].x[1],3);
+	mpz_set_ui(Omega.x[0].x[1].x[2],3);
+	mpz_set_ui(Omega.x[0].x[1].x[3],3);
+	Fp24_Pow(&Omega,&Omega,hoge);
+	Fp24_Show(&Omega);
+}
+void hoge(){
+	struct EFp48 A,B,C;
+	EFp48_Init(&A);
+	EFp48_Init(&B);
+	EFp48_Init(&C);
+
+	EFp48_Rand(&A);
+	EFp48_Rand(&B);
+	EFp48_ECA(&C,&A,&B);
+	EFp48_ECD(&C,&C);
+	EFp48_Show(&C);
+	EFp48_ECD(&A,&A);
+	EFp48_ECD(&B,&B);
+	EFp48_ECA(&C,&A,&B);
+	EFp48_Show(&C);
 
 }
-
 /*-----------------------------------Memo------------------------------------------
-Fp48完成か？できてないならFp24の法多項式を調整。
+EFp48完成
+これからパラメーターを調整
 */
 
 
 //-----------------------------------main-------------------------------------------
 //bit length
 //prime : 275
-//p^k : 5935
-//r : 222
+//p^k : 11870
+//r : 222?
 int main(void){
 	unsigned int now = (unsigned int)time(0);
 	srand(now);
@@ -3949,7 +4273,7 @@ int main(void){
 	//mpz_out_str(stdout,2,prime);
 	//printf("\n");
 
-	//Free();
+	hoge();
 	//Tate_Test();
 	//ParaSerch();
 	//Tate_Check();
