@@ -3198,6 +3198,34 @@ void Tate_Check(){
 	Fp24_Clear(&tmp);
 }
 
+void Tate_Test(){
+	clock_t start,end;
+	struct EFp24 P,Q;
+	struct Fp24 tmp;
+	EFp24_Init(&P);
+	EFp24_Init(&Q);
+	Fp24_Init(&tmp);
+
+	EFp24_G1_Rand(&P);
+	EFp24_G2_Rand(&Q);
+	printf("G1\n");
+	EFp24_Show(&P);
+	printf("G2\n");
+	EFp24_Show(&Q);
+	start = clock();
+	Tate_Pairing(&tmp,&P,&Q);
+	end = clock();
+	printf("result\n");
+	Fp24_Show(&tmp);//hoge
+
+	printf("TatePairing Time %f\n",(double)(end-start)/CLOCKS_PER_SEC);
+
+	EFp24_Clear(&P);
+	EFp24_Clear(&Q);
+	Fp24_Clear(&tmp);
+
+}
+
 void Ate_Check(){
 	struct EFp24 P,Q;
 	struct Fp24 tmp;
@@ -3380,27 +3408,7 @@ int main(void){
 	//mpz_out_str(stdout,2,prime);
 	//printf("\n");
 
-	clock_t start,end;
-	struct EFp24 P,Q;
-	struct Fp24 tmp;
-	EFp24_Init(&P);
-	EFp24_Init(&Q);
-	Fp24_Init(&tmp);
-
-	EFp24_G1_Rand(&P);
-	EFp24_G2_Rand(&Q);
-	printf("G1\n");
-	EFp24_Show(&P);
-	printf("G2\n");
-	EFp24_Show(&Q);
-	start = clock();
-	Tate_Pairing(&tmp,&P,&Q);
-	end = clock();
-	printf("result\n");
-	Fp24_Show(&tmp);//hoge
-
-	printf("TatePairing Time %f\n",(double)(end-start)/CLOCKS_PER_SEC);
-
+	Tate_Test();
 	//ParaSerch();
 	//Tate_Check();
 	//Ate_Check();
